@@ -1,0 +1,299 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: test@test.com
+  description: User Registation API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://www.newlook.com/api_terms/
+  title: User Registation API
+  version: 1.0.0
+servers:
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/DigitalCommerceServi/UserRegistation/1.0.0
+- description: Registration
+  url: https://localhost:8081/registration/v1
+tags:
+- description: |
+    User Registration.
+  name: Registation
+paths:
+  /registration:
+    post:
+      description: |
+        This operation returns details of user session and CT cart ID and GUID.
+      operationId: registration
+      parameters:
+      - explode: false
+        in: header
+        name: X-SESSIONID
+        required: false
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Registration:
+                $ref: '#/components/examples/RegistrationData'
+                value: null
+            schema:
+              $ref: '#/components/schemas/RegistrationData'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              examples:
+                RegistrationResponseExample:
+                  $ref: '#/components/examples/RegistrationResponseExample'
+                  value: null
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+          description: Responds with a current state of the consent registry
+        "400":
+          content:
+            application/json:
+              examples:
+                BadRequestExample:
+                  $ref: '#/components/examples/BadRequest'
+                  value: null
+              schema:
+                $ref: '#/components/schemas/HTTP400Error'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              examples:
+                NotAuthorizedExample:
+                  $ref: '#/components/examples/NotAuthorized'
+                  value: null
+              schema:
+                $ref: '#/components/schemas/HTTP401Error'
+          description: Not Authorized
+        default:
+          content:
+            application/json:
+              examples:
+                UnexpectedErrorExample:
+                  $ref: '#/components/examples/DefaultError'
+                  value: null
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unknown Error has happened
+      summary: Handover the cart to SAP CX.
+      tags:
+      - cartHandover
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: cartHandover
+components:
+  examples:
+    RegistrationData:
+      value:
+        userId: test
+        phoneNumber: "0001"
+        password: '*******'
+    DefaultError:
+      value:
+        code: 500
+        message: Unkown Error has happened
+    NotFound:
+      value:
+        statusCode: 404
+        message: Resource not found
+    BadRequest:
+      value:
+        statusCode: 400
+        message: Bad Request
+    RegistrationResponseExample:
+      value:
+        statusCode: 200
+        message: Success
+    NotAuthorized:
+      value:
+        statusCode: 401
+        message: The request is not authorized for this resource
+    Forbidden:
+      value:
+        statusCode: 403
+        message: User does not have permission to access this resource.
+  responses:
+    DefaultError:
+      content:
+        application/json:
+          examples:
+            UnexpectedErrorExample:
+              $ref: '#/components/examples/DefaultError'
+              value: null
+          schema:
+            $ref: '#/components/schemas/HTTPError'
+      description: Unknown Error has happened
+    NotAuthorized:
+      content:
+        application/json:
+          examples:
+            NotAuthorizedExample:
+              $ref: '#/components/examples/NotAuthorized'
+              value: null
+          schema:
+            $ref: '#/components/schemas/HTTP401Error'
+      description: Not Authorized
+    NotFound:
+      content:
+        application/json:
+          examples:
+            NotFoundExample:
+              $ref: '#/components/examples/NotFound'
+              value: null
+          schema:
+            $ref: '#/components/schemas/HTTP404Error'
+      description: Requested Resource not found
+    BadRequest:
+      content:
+        application/json:
+          examples:
+            BadRequestExample:
+              $ref: '#/components/examples/BadRequest'
+              value: null
+          schema:
+            $ref: '#/components/schemas/HTTP400Error'
+      description: Bad Request
+    Forbidden:
+      content:
+        application/json:
+          examples:
+            NotAuthorizedExample:
+              $ref: '#/components/examples/Forbidden'
+              value: null
+          schema:
+            $ref: '#/components/schemas/HTTP403Error'
+      description: Forbidden
+  schemas:
+    RegistrationData:
+      example:
+        password: password
+        userID: userID
+      properties:
+        userID:
+          description: Will hold the information about user's id/email.
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - userID
+      type: object
+    Error:
+      properties:
+        code:
+          description: error code
+          type: string
+        message:
+          description: error message
+          type: string
+      type: object
+    HTTPError:
+      properties:
+        statusCode:
+          description: error HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: error message
+          type: string
+        errors:
+          description: underlying errors
+          items:
+            $ref: '#/components/schemas/Error'
+          type: array
+      type: object
+    HTTP401Error:
+      properties:
+        statusCode:
+          description: error HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: error message
+          type: string
+      type: object
+    HTTP404Error:
+      properties:
+        statusCode:
+          description: error HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: error message
+          type: string
+      type: object
+    ValidationError:
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - $ref: '#/components/schemas/ValidationError_allOf'
+      required:
+      - code
+      - message
+    HTTP400Error:
+      properties:
+        statusCode:
+          description: error HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: error message
+          type: string
+        errorClassification:
+          enum:
+          - securityViolation
+          - contractViolation
+          - fieldValueViolation
+          - businessLogicViolation
+          type: string
+        errors:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+      required:
+      - message
+      - statusCode
+      type: object
+    HTTP403Error:
+      properties:
+        statusCode:
+          description: error HTTP status code
+          format: int32
+          type: integer
+        message:
+          description: error message
+          type: string
+      type: object
+    RegistrationResponse:
+      example:
+        message: message
+        statusCode: statusCode
+      properties:
+        statusCode:
+          description: Registration Response
+          type: string
+        message:
+          description: Session Guid from SAP CX
+          type: string
+      type: object
+    ValidationError_allOf:
+      properties:
+        fieldName:
+          type: string
+        localisedMessage:
+          additionalProperties:
+            type: string
+          description: Dictionary object where the key is expected to be language
+            isocode (en/de/fr) and the value is expected to be the localised error
+            message.
+          type: object
+      type: object
+      example: null

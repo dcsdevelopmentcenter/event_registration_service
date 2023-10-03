@@ -1,0 +1,24 @@
+application:
+  api:
+    base:
+      url: /registration
+    aws:
+      verification:
+        lambda:
+          url: https://6y4k642pvwrmcqu3kys4jg4i2q0nqhzo.lambda-url.us-east-1.on.aws/
+server:
+  port: 8081
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+  data:
+    mongodb:
+      uri: mongodb+srv://arijeetmazumdar:eGvom6hsD1w4s5pj@cluster0.kjnuwxy.mongodb.net/?retryWrites=true&w=majority
+      database: eventmanagement
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
